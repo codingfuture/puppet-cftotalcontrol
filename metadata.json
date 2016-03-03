@@ -1,0 +1,52 @@
+{
+  "name": "codingfuture-cftotalcontrol",
+  "version": "0.1.0",
+  "author": "Andrey Galkin",
+  "summary": "Generate bash aliases for total control of configured Puppet hosts",
+  "license": "Apache-2.0",
+  "source": "https://github.com/codingfuture/puppet-cftotalcontrol",
+  "project_page": "https://github.com/codingfuture/puppet-cftotalcontrol",
+  "issues_url": "https://github.com/codingfuture/puppet-cftotalcontrol/issues",
+  "operatingsystem_support": [
+    {
+      "operatingsystem": "Debian",
+      "operatingsystemrelease": [
+        "8"
+      ]
+    },
+    {
+      "operatingsystem": "Ubuntu",
+      "operatingsystemrelease": [
+        "14.04",
+        "15.04",
+        "15.10"
+      ]
+    }
+  ],
+  "requirements": [
+    {
+      "name": "puppet",
+      "version_requirement": ">=4.0.0 <5.0.0"
+    }
+  ],
+  "dependencies": [
+    {
+      "name": "puppetlabs-stdlib",
+      "version_requirement": ">= 4.11.0"
+    },
+    {
+      "name": "puppetlabs-apt",
+      "version_requirement": ">= 2.2.1"
+    },
+    {
+      "name": "codingfuture-cfnetwork",
+      "version_requirement": ">= 0.9.4"
+    },
+    {
+      "name" :"dalen-puppetdbquery",
+      "version_requirement": ">= 2.1.1"
+    }
+  ],
+  "data_provider": "hiera"
+}
+
