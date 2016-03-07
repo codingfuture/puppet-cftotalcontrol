@@ -15,4 +15,8 @@ class cftotalcontrol::auth {
             require => User[$admin_user],
         }
     }
+    
+    Cftotalcontrol::Internal::Ssh_port <<| hostname == $::trusted['certname'] |>>
+    Cfnetwork::Describe_service <| tag == 'cftotalcontrol' |> ->
+    Cfnetwork::Client_port <| tag == 'cftotalcontrol' |>
 }

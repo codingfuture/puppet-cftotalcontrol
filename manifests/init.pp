@@ -134,6 +134,36 @@ class cftotalcontrol (
         user => $control_user,
     }
     
+    # Export outgoing proxy ports
+    $proxy_ports = $node_cfauth.reduce({}) |$memo, $kv| {
+        $nodename = $kv[0]
+        $cfauth_params = $kv[1]
+        $loc = $node_facts[$nodename]['cf_location']
+        $locpool = $node_facts[$nodename]['cf_location_pool']
+        $ssh_port = any2array($cfauth_params['sshd_ports'])[0]
+        $proxy_host = pick_default(
+            $pool_proxy["${loc}/${locpool}"],
+            $pool_proxy[$loc]
+        )
+
+        if is_string($proxy_host) and $proxy_host != '' {
+            if has_key($memo, $proxy_host) {
+                merge($memo, { $proxy_host => [$ssh_port] + $memo[$proxy_host] })
+            } else {
+                merge($memo, { $proxy_host => [$ssh_port] })
+            }
+        } else {
+            $memo
+        }
+    }
+
+    $proxy_ports.each |$nodename, $ports| {
+        @@cftotalcontrol::internal::ssh_port { "${::trusted['certname']}_${nodename}":
+            hostname => $nodename,
+            ports    => unique($ports),
+        }
+    }
+    
     # Generate key
     exec { 'cftotalcontrol_genkey':
         command => "/usr/bin/ssh-keygen -q -t rsa -b 4096 -P '' -f $ssh_idrsa",
