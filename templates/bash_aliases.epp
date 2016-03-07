@@ -1,0 +1,89 @@
+
+CFTOTAL_CONTROL_SSHCONF="<%= $cftotalcontrol::ssh_config %>"
+
+# Call SSH with TotalControl options
+function ssh_tc() {
+    ssh -F $CFTOTAL_CONTROL_SSHCONF "$@"
+}
+
+# Call SCP with TotalControl options
+function scp_tc() {
+    scp -F $CFTOTAL_CONTROL_SSHCONF "$@"
+}
+
+# Mass sequential SSH invocation
+#--------------------------------------
+function ssh_masscmd() {
+    for n in $(cat <%= $cftotalcontrol::ssh_dir %>/cftchostsall); do
+        ssh_tc "$n" -- "$@"
+    done
+}
+<% $cftotalcontrol::mass_commands_all.each |$cmdname, $cmd| { -%>
+function ssh_mass_<%= $cmdname %>() {
+    ssh_masscmd <%= $cmd %>
+}
+<% } -%>
+
+
+# Mass parallel SSH invocation
+#--------------------------------------
+function pssh_masscmd() {
+    parallel-ssh \
+        -x "-F $CFTOTAL_CONTROL_SSHCONF" \
+        -h <%= $cftotalcontrol::ssh_dir %>/cftchostsall \
+        -p <%= $cftotalcontrol::parallel %> \
+        "$@"
+}
+<% $cftotalcontrol::mass_commands_all.each |$cmdname, $cmd| { -%>
+function pssh_mass_<%= $cmdname %>() {
+    pssh_masscmd <%= $cmd %>
+}
+<% } -%>
+
+
+<% $cftotalcontrol::node_alias.each |$nodename, $nodealias| { -%>
+# Node <%= $nodename %>
+#--------------------------------------
+function ssh_<%= $nodealias %>() {
+    ssh_tc "<%= $nodename %>" -- "$@"
+}
+<% $cftotalcontrol::mass_commands_all.each |$cmdname, $cmd| { -%>
+function ssh_<%= $nodealias %>_<%= $cmdname %>() {
+    ssh_<%= $nodealias %> <%= $cmd %>
+}
+<% } -%>
+
+<% } -%>
+
+<% $cftotalcontrol::node_groups.each |$groupname, $nodes| { 
+    $host_file = "${cftotalcontrol::ssh_dir}/cftchosts_${groupname}"
+-%>
+# Group <%= $groupname %>
+#--------------------------------------
+function sshgrp_<%= $groupname %>() {
+    for n in $(cat <%= $host_file %>); do
+        ssh_tc "$n" -- "$@"
+    done
+}
+<% $cftotalcontrol::mass_commands_all.each |$cmdname, $cmd| { -%>
+function sshgrp_<%= $groupname %>_<%= $cmdname %>() {
+    sshgrp_<%= $groupname %> <%= $cmd %>
+}
+<% } -%>
+
+function psshgrp_<%= $groupname %>() {
+    parallel-ssh \
+        -x "-F $CFTOTAL_CONTROL_SSHCONF" \
+        -h <%= $host_file %> \
+        -p <%= $cftotalcontrol::parallel %> \
+        "$@"
+}
+<% $cftotalcontrol::mass_commands_all.each |$cmdname, $cmd| { -%>
+function psshgrp_<%= $groupname %>_<%= $cmdname %>() {
+    psshgrp_<%= $groupname %> <%= $cmd %>
+}
+<% } -%>
+
+<% } -%>
+
+

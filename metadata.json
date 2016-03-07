@@ -43,6 +43,10 @@
       "version_requirement": ">= 0.9.4"
     },
     {
+      "name": "codingfuture-cfauth",
+      "version_requirement": ">= 0.9.3"
+    },
+    {
       "name" :"dalen-puppetdbquery",
       "version_requirement": ">= 2.1.1"
     }
