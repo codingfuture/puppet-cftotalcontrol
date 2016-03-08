@@ -136,6 +136,8 @@ function psshgrp_<%= $groupname %>_<%= $cmdname %>() {
 
 
 # Add or generate key on startup
-test -e <%= $cftotalcontrol::ssh_idkey %> && cftc_add_key || cftc_gen_key
+if test -n "$PS1"; then
+    test -e <%= $cftotalcontrol::ssh_idkey %> && cftc_add_key || cftc_gen_key
+fi
 # Check old key
 cftc_check_old_key

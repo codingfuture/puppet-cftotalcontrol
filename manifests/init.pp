@@ -185,12 +185,20 @@ class cftotalcontrol (
     
     if $autogen_ssh_key {
         exec { 'cftotalcontrol_genkey':
-            command => "/usr/bin/ssh-keygen -q -t ${ssh_key_type} -b ${ssh_key_bits} -P '' -f $ssh_idkey",
+            command => "/usr/bin/ssh-keygen -q -t ${ssh_key_type} -b ${ssh_key_bits} -P '' -f ${ssh_idkey}",
             creates => $ssh_idkey,
             user    => $control_user,
             group   => $control_user,
             require => File[$ssh_dir],
             before  => File['/etc/cftckey'],
         }
+    }
+    
+    # Cron to check for outdated key
+    cron { 'cftotalcontrol_outdated_key':
+        command => "bash -c '. ${control_home}/.cftotalcontrol_aliases && cftc_check_old_key'",
+        user    => $control_user,
+        hour    => 12,
+        minute  => 0,
     }
 }
