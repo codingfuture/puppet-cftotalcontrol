@@ -27,7 +27,7 @@ function cftc_add_key() {
 }
 
 # Add key on startup
-test -e <%= $cftotalcontrol::ssh_idkey %> && cftc_add_key
+test -e <%= $cftotalcontrol::ssh_idkey %> && cftc_add_key || cftc_gen_key
 
 # Mass sequential SSH invocation
 #--------------------------------------
