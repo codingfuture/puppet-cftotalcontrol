@@ -46,6 +46,16 @@ function cftc_deploy_key() {
     pssh_mass_puppetdeploy
 }
 
+# Check if key is old and need to be regenerated
+function cftc_check_old_key() {
+    local ssh_idkey=<%= $cftotalcontrol::ssh_idkey %>
+    local olddays=<%= $cftotalcontrol::ssh_old_key_days %>
+    if test -e $ssh_idkey && find $ssh_idkey -mtime $olddays | read; then
+        echo "WARNING: Private key is too old (>$olddays days)."
+        echo 'Please run "cftc_gen_key" to regenerate key and mass update'
+    fi
+}
+
 # Mass sequential SSH invocation
 #--------------------------------------
 function ssh_masscmd() {
@@ -125,5 +135,7 @@ function psshgrp_<%= $groupname %>_<%= $cmdname %>() {
 
 
 
-# Add key on startup
+# Add or generate key on startup
 test -e <%= $cftotalcontrol::ssh_idkey %> && cftc_add_key || cftc_gen_key
+# Check old key
+cftc_check_old_key

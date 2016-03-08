@@ -9,6 +9,7 @@ class cftotalcontrol (
     $ssh_key_type = 'rsa',
     $ssh_key_bits = 4096,
     $autogen_ssh_key = false,
+    $ssh_old_key_days = 180,
 ) {
     include stdlib
     include cfnetwork
