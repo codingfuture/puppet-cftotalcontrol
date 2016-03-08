@@ -1,11 +1,14 @@
 
 class cftotalcontrol (
     $pool_proxy = {},
-    $control_user = 'root',
-    $control_home = '/root',
+    $control_user = 'cftcuser',
+    $control_home = '/home/cftcuser',
     $host_groups = {},
     $parallel = 10,
     $mass_commands = {},
+    $ssh_key_type = 'rsa',
+    $ssh_key_bits = 4096,
+    $autogen_ssh_key = false,
 ) {
     include stdlib
     include cfnetwork
@@ -13,7 +16,7 @@ class cftotalcontrol (
     package { 'pssh': }
     $ssh_dir = "${control_home}/.ssh"
     $ssh_config = "${ssh_dir}/cftotalcontrol_config"
-    $ssh_idrsa = "${ssh_dir}/cftc_id_rsa"
+    $ssh_idkey = "${ssh_dir}/cftc_id_${ssh_key_type}"
 
     # Only interested in nodes with cfauth class
     # See https://github.com/dalen/puppet-puppetdbquery/pull/88
@@ -53,8 +56,8 @@ class cftotalcontrol (
     # Mass commands
     $mass_commands_all = $mass_commands + {
         'aptupdate'    => 'sudo /usr/bin/apt-get update',
-        'aptupgrade'   => 'sudo /usr/bin/apt-get dist-upgrade -q "$@"',
-        'puppetdeploy' => 'sudo opt/puppetlabs/puppet/bin/puppet agent --test "$@"',
+        'aptupgrade'   => 'sudo DEBIAN_FRONTEND=noninteractive /usr/bin/apt-get dist-upgrade -o Dpkg::Options::="--force-confold" -qf',
+        'puppetdeploy' => 'sudo /opt/puppetlabs/puppet/bin/puppet agent --test',
     }
     
     # create user
@@ -165,14 +168,25 @@ class cftotalcontrol (
     }
     
     # Generate key
-    exec { 'cftotalcontrol_genkey':
-        command => "/usr/bin/ssh-keygen -q -t rsa -b 4096 -P '' -f $ssh_idrsa",
-        creates => $ssh_idrsa,
-        user    => $control_user,
+    file { "${ssh_idkey}.pub":
+        owner   => $control_user,
         group   => $control_user,
-        require => File[$ssh_dir],
+        mode   => '0600',
+        content => '',
+        replace => false,
     } ->
     file { '/etc/cftckey':
-        source => "${ssh_idrsa}.pub",
+        source => "${ssh_idkey}.pub",
+    }
+    
+    if $autogen_ssh_key {
+        exec { 'cftotalcontrol_genkey':
+            command => "/usr/bin/ssh-keygen -q -t ${ssh_key_type} -b ${ssh_key_bits} -P '' -f $ssh_idkey",
+            creates => $ssh_idkey,
+            user    => $control_user,
+            group   => $control_user,
+            require => File[$ssh_dir],
+            before  => File['/etc/cftckey'],
+        }
     }
 }

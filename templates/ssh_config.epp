@@ -2,11 +2,12 @@ ConnectTimeout 10
 ServerAliveCountMax 3
 ServerAliveInterval 15
 
-ControlMaster auto
-ControlPersist 3m
-ControlPath <%= $cftotalcontrol::control_home %>/.ssh/%C
+# It does not play well in parallel & ProxyCommand
+#ControlMaster auto
+#ControlPersist 3m
+#ControlPath <%= $cftotalcontrol::control_home %>/.ssh/%C
 
-IdentityFile <%= $cftotalcontrol::ssh_idrsa %>
+IdentityFile <%= $cftotalcontrol::ssh_idkey %>
 
 <% $cftotalcontrol::node_cfauth.each |$nodename, $cfauth_params| {
     $loc = $cftotalcontrol::node_facts[$nodename]['cf_location']
@@ -21,7 +22,7 @@ Host <%= $nodename %>
     User <%= $cfauth_params['admin_user'] %>
     Port <%= $ssh_port %>
 <% if is_string($proxy_host) and $proxy_host != '' { -%>
-    ProxyCommand /usr/bin/ssh -W <%= $nodename %>:<%= $ssh_port %> <%= $proxy_host %>
+    ProxyCommand /usr/bin/ssh -W <%= $nodename %>:<%= $ssh_port %> -F <%= $cftotalcontrol::ssh_config %> <%= $proxy_host %>
 <% } -%>
 
 <% } -%>
