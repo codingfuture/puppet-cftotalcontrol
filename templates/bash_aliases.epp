@@ -26,10 +26,11 @@ function cftc_gen_key() {
     echo 'Do not forget to run "puppet agent -t" on this system'
     echo '  to export public key to PuppetDB.'
     echo 'After that run mass deployment.'
+    echo ''
     
     if test -e $ssh_oldkey; then
         echo "Automatically forcing mass update"
-        eval ssh_$(hostname --fqdn | sed -e 's/\./_/g')_puppetdeploy
+        cftc_deploy_key
     fi
 }
 
