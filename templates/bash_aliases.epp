@@ -16,8 +16,21 @@ function cftc_scp() {
 # (Re-)generate SSH key
 function cftc_gen_key() {
     echo "Please make sure you use password in production!"
-    /usr/bin/ssh-keygen -t <%= $cftotalcontrol::ssh_key_type %> -b <%= $cftotalcontrol::ssh_key_bits %> -f <%= $cftotalcontrol::ssh_idkey %>
+    local ssh_idkey=<%= $cftotalcontrol::ssh_idkey %>
+    local ssh_oldkey=${ssh_idkey}$(date +'%s')
+    test -e $ssh_idkey && mv -f $ssh_idkey $ssh_oldkey
+    /usr/bin/ssh-keygen -t <%= $cftotalcontrol::ssh_key_type %> -b <%= $cftotalcontrol::ssh_key_bits %> -f $ssh_idkey
     cftc_add_key
+    
+    echo ''
+    echo 'Do not forget to run "puppet agent -t" on this system'
+    echo '  to export public key to PuppetDB.'
+    echo 'After that run mass deployment.'
+    
+    if test -e $ssh_oldkey; then
+        echo "Automatically forcing mass update"
+        eval ssh_$(hostname --fqdn | sed -e 's/\./_/g')_puppetdeploy
+    fi
 }
 
 # Initialize agent and add ssh key
@@ -26,8 +39,11 @@ function cftc_add_key() {
         eval `ssh-agent` && ssh-add <%= $cftotalcontrol::ssh_idkey %>
 }
 
-# Add key on startup
-test -e <%= $cftotalcontrol::ssh_idkey %> && cftc_add_key || cftc_gen_key
+# Deploy new key puppet server under control
+function cftc_deploy_key() {
+    ssh_$(hostname --fqdn | sed -e 's/\./_/g')_puppetdeploy
+    pssh_mass_puppetdeploy
+}
 
 # Mass sequential SSH invocation
 #--------------------------------------
@@ -107,3 +123,6 @@ function psshgrp_<%= $groupname %>_<%= $cmdname %>() {
 <% } -%>
 
 
+
+# Add key on startup
+test -e <%= $cftotalcontrol::ssh_idkey %> && cftc_add_key || cftc_gen_key

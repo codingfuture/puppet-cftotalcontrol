@@ -95,6 +95,8 @@ class cftotalcontrol (
     }
 
     file { "${control_home}/.cftotalcontrol_aliases":
+        owner   => $control_user,
+        group   => $control_user,
         content => epp('cftotalcontrol/bash_aliases.epp')
     }
 
@@ -174,9 +176,10 @@ class cftotalcontrol (
         mode   => '0600',
         content => '',
         replace => false,
-    } ->
+    }
     file { '/etc/cftckey':
-        source => "${ssh_idkey}.pub",
+        ensure => link,
+        target => "${ssh_idkey}.pub",
     }
     
     if $autogen_ssh_key {
