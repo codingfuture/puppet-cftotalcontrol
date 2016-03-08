@@ -17,6 +17,7 @@ function cftc_scp() {
 function cftc_gen_key() {
     echo "Please make sure you use password in production!"
     /usr/bin/ssh-keygen -t <%= $cftotalcontrol::ssh_key_type %> -b <%= $cftotalcontrol::ssh_key_bits %> -f <%= $cftotalcontrol::ssh_idkey %>
+    cftc_add_key
 }
 
 # Initialize agent and add ssh key
