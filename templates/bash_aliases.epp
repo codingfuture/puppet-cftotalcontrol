@@ -1,6 +1,19 @@
+<%- |
+    String $ssh_config,
+    String $ssh_idkey,
+    String $ssh_dir,
+    String $ssh_key_type,
+    Integer $ssh_key_bits,
+    Integer $ssh_old_key_days,
+    Hash $standard_commands_all,
+    Array[String] $node_order,
+    Hash $node_alias,
+    Hash $node_groups,
+    Integer $parallel
+| -%>
 
-CFTC_SSHCONF="<%= $cftotalcontrol::ssh_config %>"
-PSSH_COUNT=<%= $cftotalcontrol::parallel %>
+CFTC_SSHCONF="<%= $ssh_config %>"
+PSSH_COUNT=<%= $parallel %>
 PSSH_OPTS=-i
 SSH_OPTS=
 SCP_OPTS=
@@ -18,10 +31,10 @@ function cftc_scp() {
 # (Re-)generate SSH key
 function cftc_gen_key() {
     echo "Please make sure you use password in production!"
-    local ssh_idkey=<%= $cftotalcontrol::ssh_idkey %>
+    local ssh_idkey=<%= $ssh_idkey %>
     local ssh_oldkey=${ssh_idkey}$(date +'%s')
     test -e $ssh_idkey && mv -f $ssh_idkey $ssh_oldkey
-    /usr/bin/ssh-keygen -t <%= $cftotalcontrol::ssh_key_type %> -b <%= $cftotalcontrol::ssh_key_bits %> -f $ssh_idkey
+    /usr/bin/ssh-keygen -t <%= $ssh_key_type %> -b <%= $ssh_key_bits %> -f $ssh_idkey
     cftc_add_key
     
     echo ''
@@ -39,7 +52,7 @@ function cftc_gen_key() {
 # Initialize agent and add ssh key
 function cftc_add_key() {
     test -n "$SSH_AUTH_SOCK" && test -e "$SSH_AUTH_SOCK" || \
-        eval `ssh-agent` && ssh-add <%= $cftotalcontrol::ssh_idkey %>
+        eval `ssh-agent` && ssh-add <%= $ssh_idkey %>
 }
 
 # Deploy new key puppet server under control
@@ -50,8 +63,8 @@ function cftc_deploy_key() {
 
 # Check if key is old and need to be regenerated
 function cftc_check_old_key() {
-    local ssh_idkey=<%= $cftotalcontrol::ssh_idkey %>
-    local olddays=<%= $cftotalcontrol::ssh_old_key_days %>
+    local ssh_idkey=<%= $ssh_idkey %>
+    local olddays=<%= $ssh_old_key_days %>
     if test -e $ssh_idkey && find $ssh_idkey -mtime $olddays | read; then
         echo "WARNING: Private key is too old (>$olddays days)."
         echo 'Please run "cftc_gen_key" to regenerate key and mass update'
@@ -61,11 +74,11 @@ function cftc_check_old_key() {
 # Mass sequential SSH invocation
 #--------------------------------------
 function ssh_masscmd() {
-    for n in $(cat <%= $cftotalcontrol::ssh_dir %>/cftchostsall); do
+    for n in $(cat <%= $ssh_dir %>/cftchostsall); do
         cftc_ssh "$n" -- "$@"
     done
 }
-<% $cftotalcontrol::standard_commands_all.each |$cmdname, $cmd| { -%>
+<% $standard_commands_all.each |$cmdname, $cmd| { -%>
 function ssh_mass_<%= $cmdname %>() {
     ssh_masscmd <%= $cmd %>
 }
@@ -77,27 +90,27 @@ function ssh_mass_<%= $cmdname %>() {
 function pssh_masscmd() {
     parallel-ssh \
         -x "-F $CFTC_SSHCONF $SSH_OPTS" \
-        -h <%= $cftotalcontrol::ssh_dir %>/cftchostsall \
+        -h <%= $ssh_dir %>/cftchostsall \
         -p $PSSH_COUNT \
         $PSSH_OPTS \
         "$@"
 }
-<% $cftotalcontrol::standard_commands_all.each |$cmdname, $cmd| { -%>
+<% $standard_commands_all.each |$cmdname, $cmd| { -%>
 function pssh_mass_<%= $cmdname %>() {
     pssh_masscmd <%= $cmd %> "$@"
 }
 <% } -%>
 
 
-<% $cftotalcontrol::node_order.each |$nodename| {
-    $nodealias = $cftotalcontrol::node_alias[$nodename]
+<% $node_order.each |$nodename| {
+    $nodealias = $node_alias[$nodename]
 -%>
 # Node <%= $nodename %>
 #--------------------------------------
 function ssh_<%= $nodealias %>() {
     cftc_ssh "<%= $nodename %>" -- "$@"
 }
-<% $cftotalcontrol::standard_commands_all.each |$cmdname, $cmd| { -%>
+<% $standard_commands_all.each |$cmdname, $cmd| { -%>
 function ssh_<%= $nodealias %>_<%= $cmdname %>() {
     ssh_<%= $nodealias %> <%= $cmd %> "$@"
 }
@@ -105,8 +118,8 @@ function ssh_<%= $nodealias %>_<%= $cmdname %>() {
 
 <% } -%>
 
-<% $cftotalcontrol::node_groups.each |$groupname, $nodes| { 
-    $host_file = "${cftotalcontrol::ssh_dir}/cftchosts_${groupname}"
+<% $node_groups.each |$groupname, $nodes| { 
+    $host_file = "${ssh_dir}/cftchosts_${groupname}"
 -%>
 # Group <%= $groupname %>
 #--------------------------------------
@@ -115,7 +128,7 @@ function sshgrp_<%= $groupname %>() {
         cftc_ssh "$n" -- "$@"
     done
 }
-<% $cftotalcontrol::standard_commands_all.each |$cmdname, $cmd| { -%>
+<% $standard_commands_all.each |$cmdname, $cmd| { -%>
 function sshgrp_<%= $groupname %>_<%= $cmdname %>() {
     sshgrp_<%= $groupname %> <%= $cmd %> "$@"
 }
@@ -129,7 +142,7 @@ function psshgrp_<%= $groupname %>() {
         $PSSH_OPTS \
         "$@"
 }
-<% $cftotalcontrol::standard_commands_all.each |$cmdname, $cmd| { -%>
+<% $standard_commands_all.each |$cmdname, $cmd| { -%>
 function psshgrp_<%= $groupname %>_<%= $cmdname %>() {
     psshgrp_<%= $groupname %> <%= $cmd %> "$@"
 }
@@ -141,7 +154,7 @@ function psshgrp_<%= $groupname %>_<%= $cmdname %>() {
 
 # Add or generate key on startup
 if test -n "$PS1"; then
-    test -e <%= $cftotalcontrol::ssh_idkey %> && cftc_add_key || cftc_gen_key
+    test -e <%= $ssh_idkey %> && cftc_add_key || cftc_gen_key
 fi
 # Check old key
 cftc_check_old_key

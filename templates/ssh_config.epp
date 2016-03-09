@@ -1,3 +1,12 @@
+<%- |
+    String $ssh_dir,
+    String $ssh_config,
+    String $ssh_idkey,
+    Array[String] $node_order,
+    Hash $node_cfauth,
+    Hash $node_facts,
+    Hash $pool_proxy
+| -%>
 StrictHostKeyChecking no
 
 ConnectTimeout 10
@@ -7,25 +16,25 @@ ServerAliveInterval 15
 # It does not play well in parallel & ProxyCommand
 #ControlMaster auto
 #ControlPersist 3m
-#ControlPath <%= $cftotalcontrol::control_home %>/.ssh/%C
+#ControlPath <%= $ssh_dir %>/%C
 
-IdentityFile <%= $cftotalcontrol::ssh_idkey %>
+IdentityFile <%= $ssh_idkey %>
 
-<% $cftotalcontrol::node_order.each |$nodename| {
-    $cfauth_params = $cftotalcontrol::node_cfauth[$nodename]
-    $loc = $cftotalcontrol::node_facts[$nodename]['cf_location']
-    $locpool = $cftotalcontrol::node_facts[$nodename]['cf_location_pool']
+<% $node_order.each |$nodename| {
+    $cfauth_params = $node_cfauth[$nodename]
+    $loc = $node_facts[$nodename]['cf_location']
+    $locpool = $node_facts[$nodename]['cf_location_pool']
     $ssh_port = any2array($cfauth_params['sshd_ports'])[0]
     $proxy_host = pick_default(
-        $cftotalcontrol::pool_proxy["${loc}/${locpool}"],
-        $cftotalcontrol::pool_proxy[$loc]
+        $pool_proxy["${loc}/${locpool}"],
+        $pool_proxy[$loc]
     )
 -%>
 Host <%= $nodename %>
     User <%= $cfauth_params['admin_user'] %>
     Port <%= $ssh_port %>
 <% if is_string($proxy_host) and $proxy_host != '' { -%>
-    ProxyCommand /usr/bin/ssh -W <%= $nodename %>:<%= $ssh_port %> -F <%= $cftotalcontrol::ssh_config %> <%= $proxy_host %>
+    ProxyCommand /usr/bin/ssh -W <%= $nodename %>:<%= $ssh_port %> -F <%= $ssh_config %> <%= $proxy_host %>
 <% } -%>
 
 <% } -%>
