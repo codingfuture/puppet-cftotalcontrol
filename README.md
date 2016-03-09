@@ -34,7 +34,7 @@ Details of `cftotalcontrol`:
     * `pssh_mass_{stdcmd} {args}` - invoke standard command (`{stdcmd}`) on all hosts in parallel
 * Standard commands (`{stdcmd}` above):
     * `aptupdate` = `sudo /usr/bin/apt-get update`
-    * `aptupgrade` = `sudo DEBIAN_FRONTEND=noninteractive /usr/bin/apt-get dist-upgrade -o Dpkg::Options::="--force-confold" -qf`
+    * `aptdistupgrade` = `sudo DEBIAN_FRONTEND=noninteractive /usr/bin/apt-get dist-upgrade -o Dpkg::Options::="--force-confold" -qf`
     * `puppetdeploy` = `sudo /opt/puppetlabs/puppet/bin/puppet agent --test`
 * Special environment variables:
     * `CFTC_SSHCONF="$cftotalcontrol::control_home/.ssh/cftotalcontrol_config"`
