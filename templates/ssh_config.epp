@@ -11,7 +11,8 @@ ServerAliveInterval 15
 
 IdentityFile <%= $cftotalcontrol::ssh_idkey %>
 
-<% $cftotalcontrol::node_cfauth.each |$nodename, $cfauth_params| {
+<% $cftotalcontrol::node_order.each |$nodename| {
+    $cfauth_params = $cftotalcontrol::node_cfauth[$nodename]
     $loc = $cftotalcontrol::node_facts[$nodename]['cf_location']
     $locpool = $cftotalcontrol::node_facts[$nodename]['cf_location_pool']
     $ssh_port = any2array($cfauth_params['sshd_ports'])[0]

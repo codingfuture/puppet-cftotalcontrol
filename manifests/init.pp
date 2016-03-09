@@ -5,7 +5,7 @@ class cftotalcontrol (
     $control_home = '/home/cftcuser',
     $host_groups = {},
     $parallel = 10,
-    $mass_commands = {},
+    $standard_commands = {},
     $ssh_key_type = 'rsa',
     $ssh_key_bits = 4096,
     $autogen_ssh_key = false,
@@ -23,10 +23,11 @@ class cftotalcontrol (
     # See https://github.com/dalen/puppet-puppetdbquery/pull/88
     #$node_cfauth = query_resources(false, "Class['cfauth']", true)
     # workaround
-    $node_cfauth = (query_resources(false, "Class['cfauth']", false).reduce({}) |$m, $r|{
+    $node_cfauth = (query_resources("Class['cftotalcontrol::auth']", "Class['cfauth']", false).reduce({}) |$m, $r|{
         $cn = $r['certname']
         merge($m, { $cn => $r['parameters'] })
     })
+    $node_order = sort(keys($node_cfauth))
     
     # Known facts
     $node_facts = query_facts("Class['cfauth']", [
@@ -55,7 +56,7 @@ class cftotalcontrol (
     }
     
     # Mass commands
-    $mass_commands_all = $mass_commands + {
+    $standard_commands_all = $standard_commands + {
         'aptupdate'    => 'sudo /usr/bin/apt-get update',
         'aptupgrade'   => 'sudo DEBIAN_FRONTEND=noninteractive /usr/bin/apt-get dist-upgrade -o Dpkg::Options::="--force-confold" -qf',
         'puppetdeploy' => 'sudo /opt/puppetlabs/puppet/bin/puppet agent --test',
@@ -125,7 +126,7 @@ class cftotalcontrol (
     
     # Parallel SSH all host file
     file { "${ssh_dir}/cftchostsall":
-        content => join(keys($node_cfauth), "\n")
+        content => join($node_order, "\n")
     }
     
     # SSH ports
@@ -166,7 +167,7 @@ class cftotalcontrol (
     $proxy_ports.each |$nodename, $ports| {
         @@cftotalcontrol::internal::ssh_port { "${::trusted['certname']}_${nodename}":
             hostname => $nodename,
-            ports    => unique($ports),
+            ports    => sort(unique($ports)),
         }
     }
     

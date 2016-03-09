@@ -1,7 +1,9 @@
 
 CFTC_SSHCONF="<%= $cftotalcontrol::ssh_config %>"
+PSSH_COUNT=<%= $cftotalcontrol::parallel %>
 PSSH_OPTS=-i
 SSH_OPTS=
+SCP_OPTS=
 
 # Call SSH with TotalControl options
 function cftc_ssh() {
@@ -10,7 +12,7 @@ function cftc_ssh() {
 
 # Call SCP with TotalControl options
 function cftc_scp() {
-    scp -F $CFTC_SSHCONF $SSH_OPTS "$@"
+    scp -F $CFTC_SSHCONF $SCP_OPTS "$@"
 }
 
 # (Re-)generate SSH key
@@ -63,7 +65,7 @@ function ssh_masscmd() {
         cftc_ssh "$n" -- "$@"
     done
 }
-<% $cftotalcontrol::mass_commands_all.each |$cmdname, $cmd| { -%>
+<% $cftotalcontrol::standard_commands_all.each |$cmdname, $cmd| { -%>
 function ssh_mass_<%= $cmdname %>() {
     ssh_masscmd <%= $cmd %>
 }
@@ -76,24 +78,26 @@ function pssh_masscmd() {
     parallel-ssh \
         -x "-F $CFTC_SSHCONF $SSH_OPTS" \
         -h <%= $cftotalcontrol::ssh_dir %>/cftchostsall \
-        -p <%= $cftotalcontrol::parallel %> \
+        -p $PSSH_COUNT \
         $PSSH_OPTS \
         "$@"
 }
-<% $cftotalcontrol::mass_commands_all.each |$cmdname, $cmd| { -%>
+<% $cftotalcontrol::standard_commands_all.each |$cmdname, $cmd| { -%>
 function pssh_mass_<%= $cmdname %>() {
     pssh_masscmd <%= $cmd %> "$@"
 }
 <% } -%>
 
 
-<% $cftotalcontrol::node_alias.each |$nodename, $nodealias| { -%>
+<% $cftotalcontrol::node_order.each |$nodename| {
+    $nodealias = $cftotalcontrol::node_alias[$nodename]
+-%>
 # Node <%= $nodename %>
 #--------------------------------------
 function ssh_<%= $nodealias %>() {
     cftc_ssh "<%= $nodename %>" -- "$@"
 }
-<% $cftotalcontrol::mass_commands_all.each |$cmdname, $cmd| { -%>
+<% $cftotalcontrol::standard_commands_all.each |$cmdname, $cmd| { -%>
 function ssh_<%= $nodealias %>_<%= $cmdname %>() {
     ssh_<%= $nodealias %> <%= $cmd %> "$@"
 }
@@ -111,7 +115,7 @@ function sshgrp_<%= $groupname %>() {
         cftc_ssh "$n" -- "$@"
     done
 }
-<% $cftotalcontrol::mass_commands_all.each |$cmdname, $cmd| { -%>
+<% $cftotalcontrol::standard_commands_all.each |$cmdname, $cmd| { -%>
 function sshgrp_<%= $groupname %>_<%= $cmdname %>() {
     sshgrp_<%= $groupname %> <%= $cmd %> "$@"
 }
@@ -121,11 +125,11 @@ function psshgrp_<%= $groupname %>() {
     parallel-ssh \
         -x "-F $CFTC_SSHCONF $SSH_OPTS" \
         -h <%= $host_file %> \
-        -p <%= $cftotalcontrol::parallel %> \
+        -p $PSSH_COUNT \
         $PSSH_OPTS \
         "$@"
 }
-<% $cftotalcontrol::mass_commands_all.each |$cmdname, $cmd| { -%>
+<% $cftotalcontrol::standard_commands_all.each |$cmdname, $cmd| { -%>
 function psshgrp_<%= $groupname %>_<%= $cmdname %>() {
     psshgrp_<%= $groupname %> <%= $cmd %> "$@"
 }
