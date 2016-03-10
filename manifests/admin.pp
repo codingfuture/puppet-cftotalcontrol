@@ -59,9 +59,10 @@ define cftotalcontrol::admin (
     
     # Mass commands
     $standard_commands_all = $standard_commands + {
-        'aptupdate'    => 'sudo /usr/bin/apt-get update',
-        'aptdistupgrade'   => 'sudo DEBIAN_FRONTEND=noninteractive /usr/bin/apt-get dist-upgrade -o Dpkg::Options::="--force-confold" -qf',
-        'puppetdeploy' => 'sudo /opt/puppetlabs/puppet/bin/puppet agent --test',
+        'aptupdate'      => 'sudo /usr/bin/apt-get update',
+        'aptdistupgrade' => 'sudo DEBIAN_FRONTEND=noninteractive /usr/bin/apt-get dist-upgrade -o Dpkg::Options::="--force-confold" -qf',
+        'aptautoremove'  => 'sudo DEBIAN_FRONTEND=noninteractive /usr/bin/apt-get autoremove',
+        'puppetdeploy'   => 'sudo /opt/puppetlabs/puppet/bin/puppet agent --test',
     }
     
     # create user
