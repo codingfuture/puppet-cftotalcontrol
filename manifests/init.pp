@@ -1,7 +1,7 @@
 
 class cftotalcontrol (
     $control_user = 'cftcuser',
-    $control_home = "/home/${control_user}",
+    $control_home = "/home/cftcuser",
     $pool_proxy = {},
     $host_groups = {},
     $parallel = 10,
@@ -18,8 +18,14 @@ class cftotalcontrol (
     package { 'pssh': }
     
     if $control_user {
+        if $control_home {
+            $act_control_home = $control_home
+        } else {
+            $act_control_home = "/home/${control_user}"
+        }
+        
         cftotalcontrol::admin { $control_user:
-            control_home => $control_home,
+            control_home => $act_control_home,
             pool_proxy => $pool_proxy,
             host_groups => $host_groups,
             parallel => $parallel,
