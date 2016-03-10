@@ -5,7 +5,8 @@
     Array[String] $node_order,
     Hash $node_cfauth,
     Hash $node_facts,
-    Hash $pool_proxy
+    Hash $pool_proxy,
+    Optional[String] $control_scope
 | -%>
 StrictHostKeyChecking no
 
@@ -33,8 +34,11 @@ IdentityFile <%= $ssh_idkey %>
 Host <%= $nodename %>
     User <%= $cfauth_params['admin_user'] %>
     Port <%= $ssh_port %>
-<% if is_string($proxy_host) and $proxy_host != '' { -%>
+<% if is_string($proxy_host) and $proxy_host != '' { 
+    if $control_scope { -%>
+    ProxyCommand /usr/bin/ssh -W <%= $nodename %>:<%= $ssh_port %> -F <%= $ssh_config %> <%= $control_scope %>_proxy@<%= $proxy_host %>
+<%  } else { -%>
     ProxyCommand /usr/bin/ssh -W <%= $nodename %>:<%= $ssh_port %> -F <%= $ssh_config %> <%= $proxy_host %>
-<% } -%>
+<% } } -%>
 
 <% } -%>

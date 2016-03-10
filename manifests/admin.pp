@@ -15,12 +15,17 @@ define cftotalcontrol::admin (
     $ssh_dir = "${control_home}/.ssh"
     $ssh_config = "${ssh_dir}/cftotalcontrol_config"
     $ssh_idkey = "${ssh_dir}/cftc_id_${ssh_key_type}"
+    
+    if $control_scope {
+        $control_scope_q = " and Cftotalcontrol::Internal::Scope_anchor['${control_scope}']"
+    }
 
-    # Only interested in nodes with cfauth class
-    # See https://github.com/dalen/puppet-puppetdbquery/pull/88
-    #$node_cfauth = query_resources(false, "Class['cfauth']", true)
-    # workaround
-    $node_cfauth = (query_resources("Class['cftotalcontrol::auth']", "Class['cfauth']", false).reduce({}) |$m, $r|{
+    # Only interested in nodes with cftotalcontrol::auth [of specific scope] class
+    $node_cfauth = (query_resources(
+        "Class['cftotalcontrol::auth']${control_scope_q}",
+        "Class['cfauth']",
+        false
+    ).reduce({}) |$m, $r|{
         $cn = $r['certname']
         merge($m, { $cn => $r['parameters'] })
     })
@@ -89,6 +94,16 @@ define cftotalcontrol::admin (
             mode   => '0700',
             source => '/etc/skel/.profile',
         }
+        file {"/etc/sudoers.d/${control_user}":
+            group   => root,
+            owner   => root,
+            mode    => '0400',
+            replace => true,
+            content => "
+${control_user}   ALL=(ALL:ALL) NOPASSWD: /opt/puppetlabs/bin/puppet agent --test
+",
+            require => Package['sudo'],
+        }        
     }
 
     # Bash aliases
@@ -143,6 +158,7 @@ define cftotalcontrol::admin (
             node_cfauth => $node_cfauth,
             node_facts => $node_facts,
             pool_proxy => $pool_proxy,
+            control_scope => $control_scope,
         })
     }
     
@@ -163,11 +179,13 @@ define cftotalcontrol::admin (
         $ssh_port = any2array($cfauth['sshd_ports'])[0]
         $m + [$ssh_port]
     }), 'tcp/')
-    cfnetwork::describe_service { "cftcssh${control_user}":
-        server => $ssh_ports,
-    }
-    cfnetwork::client_port { "any:cftcssh${control_user}":
-        user => $control_user,
+    if size($ssh_ports) > 0 {
+        cfnetwork::describe_service { "cftcssh${control_user}":
+            server => $ssh_ports,
+        }
+        cfnetwork::client_port { "any:cftcssh${control_user}":
+            user => $control_user,
+        }
     }
     
     # Export outgoing proxy ports
@@ -198,6 +216,7 @@ define cftotalcontrol::admin (
             hostname      => $nodename,
             ports         => sort(unique($ports)),
             control_scope => $control_scope,
+            key_certname  => $::trusted['certname'],
         }
     }
     

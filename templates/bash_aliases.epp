@@ -38,15 +38,24 @@ function cftc_gen_key() {
     cftc_add_key
     
     echo ''
-    echo 'Do not forget to run "puppet agent -t" on this system'
-    echo '  to export public key to PuppetDB.'
-    echo 'After that run mass deployment.'
+    echo "Automatically forcing this system update to export new key"
+    sudo /opt/puppetlabs/bin/puppet agent --test
+    
     echo ''
     
     if test -e $ssh_oldkey; then
         echo "Automatically forcing mass update"
-        cftc_deploy_key
+        pssh_mass_puppetdeploy
+        
+        for h in $(egrep '^\s+ProxyCommand' $CFTC_SSHCONF | egrep -o '\S+$'); do
+            cftc_ssh $h -- sudo /opt/puppetlabs/bin/puppet agent --test
+        done
+    else
+        echo 'WARNING: Old key is missing - unable to mass deploy.'
+        echo 'Do not forget to run mass deployment of the new key.'
     fi
+    
+    echo ''
 }
 
 # Initialize agent and add ssh key
@@ -55,11 +64,6 @@ function cftc_add_key() {
         eval `ssh-agent` && ssh-add <%= $ssh_idkey %>
 }
 
-# Deploy new key puppet server under control
-function cftc_deploy_key() {
-    ssh_$(hostname --fqdn | sed -e 's/\./_/g')_puppetdeploy
-    pssh_mass_puppetdeploy
-}
 
 # Check if key is old and need to be regenerated
 function cftc_check_old_key() {
