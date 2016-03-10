@@ -158,7 +158,13 @@ function psshgrp_<%= $groupname %>_<%= $cmdname %>() {
 
 # Add or generate key on startup
 if test -n "$PS1"; then
-    test ! -e <%= $ssh_idkey %> && cftc_gen_key || cftc_add_key
+    if test ! -e <%= $ssh_idkey %>; then
+        cftc_gen_key
+    elif ! cftc_add_key; then
+        echo "Failed to add key."
+        echo "You retry this manually using 'cftc_add_key' command."
+    fi
+    
+    # Check old key
+    cftc_check_old_key
 fi
-# Check old key
-cftc_check_old_key
