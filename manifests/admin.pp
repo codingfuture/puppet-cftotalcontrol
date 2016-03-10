@@ -11,6 +11,7 @@ define cftotalcontrol::admin (
     $autogen_ssh_key = $cftotalcontrol::autogen_ssh_key,
     $ssh_old_key_days = $cftotalcontrol::ssh_old_key_days,
     $control_scope = undef,
+    $ssh_auth_keys = undef,
 ) {
     $ssh_dir = "${control_home}/.ssh"
     $ssh_config = "${ssh_dir}/cftotalcontrol_config"
@@ -66,16 +67,20 @@ define cftotalcontrol::admin (
     }
     
     # create user
-    if $control_user != 'root' {
+    if $control_user in ['root', $cfauth::admin_user] {
+        # the user must already exist
+    } else {
         group { $control_user:
             ensure => present,
         } ->
         user { $control_user:
-            ensure     => present,
-            gid        => $control_user,
-            home       => $control_home,
-            managehome => true,
-            shell      => '/bin/bash',
+            ensure         => present,
+            gid            => $control_user,
+            groups         => ['ssh_access'],
+            home           => $control_home,
+            managehome     => true,
+            shell          => '/bin/bash',
+            purge_ssh_keys => true,
         } ->
         file { $control_home:
             ensure => directory,
@@ -104,7 +109,29 @@ define cftotalcontrol::admin (
 ${control_user}   ALL=(ALL:ALL) NOPASSWD: /opt/puppetlabs/bin/puppet agent --test
 ",
             require => Package['sudo'],
-        }        
+        }
+        if $ssh_auth_keys {
+            create_resources(
+                ssh_authorized_key,
+                prefix($ssh_auth_keys, "${control_user}@"),
+                {
+                    user => $control_user,
+                    'type' => 'ssh-rsa',
+                    require => User[$control_user],
+                }
+            )
+        }
+        if $cfauth::admin_auth_keys {
+            create_resources(
+                ssh_authorized_key,
+                prefix($cfauth::admin_auth_keys, "${control_user}/cfauth@"),
+                {
+                    user => $control_user,
+                    'type' => 'ssh-rsa',
+                    require => User[$control_user],
+                }
+            )
+        }
     }
 
     # Bash aliases

@@ -94,6 +94,8 @@ Add this class to host with CFTC user.
 * `ssh_key_bits = 4096` - SSH key bit length, ignored for ed25519.
 * `autogen_ssh_key = false` - Automatically generate key with no password for testing purposes.
 * `ssh_old_key_days = 180` - key age in days for generating startup & cron warnings
+* `ssh_auth_keys = undef` - hash of extra `name => ssh_authorized_key` definitions for user
+* `extra_users = undef` - hash of scoped control admins `scope => cftotalcontrol::admin`
 
 ## `cftotalcontrol::auth` class
 

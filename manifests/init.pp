@@ -1,7 +1,7 @@
 
 class cftotalcontrol (
     $control_user = 'cftcuser',
-    $control_home = "/home/cftcuser",
+    $control_home = undef,
     $pool_proxy = {},
     $host_groups = {},
     $parallel = 10,
@@ -10,7 +10,8 @@ class cftotalcontrol (
     $ssh_key_bits = 4096,
     $autogen_ssh_key = false,
     $ssh_old_key_days = 180,
-    $extra_users = {},
+    $ssh_auth_keys = undef,
+    $extra_users = undef,
 ) {
     include stdlib
     include cfnetwork
@@ -20,8 +21,10 @@ class cftotalcontrol (
     if $control_user {
         if $control_home {
             $act_control_home = $control_home
-        } else {
+        } elsif $control_user and $control_user != '' {
             $act_control_home = "/home/${control_user}"
+        } else {
+            $act_control_home = '/home/cftcuser'
         }
         
         cftotalcontrol::admin { $control_user:
@@ -34,15 +37,18 @@ class cftotalcontrol (
             ssh_key_bits => $ssh_key_bits,
             autogen_ssh_key => $autogen_ssh_key,
             ssh_old_key_days => $ssh_old_key_days,
+            ssh_auth_keys => $ssh_auth_keys,
         }
     }
     
-    $extra_users.each |$admin_name, $admin_params| {
-        create_resources(
-            cftotalcontrol::admin,
-            { "$admin_name" => $admin_params },
-            { control_scope => $admin_name }
-        )
+    if $extra_users {
+        $extra_users.each |$admin_name, $admin_params| {
+            create_resources(
+                cftotalcontrol::admin,
+                { "$admin_name" => $admin_params },
+                { control_scope => $admin_name }
+            )
+        }
     }
     
     file { "/etc/cfscopekeys/":
