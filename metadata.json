@@ -1,6 +1,6 @@
 {
   "name": "codingfuture-cftotalcontrol",
-  "version": "0.1.0",
+  "version": "0.9.0",
   "author": "Andrey Galkin",
   "summary": "Generate bash aliases for total control of configured Puppet hosts",
   "license": "Apache-2.0",
@@ -47,10 +47,9 @@
       "version_requirement": ">= 0.9.4"
     },
     {
-      "name" :"dalen-puppetdbquery",
+      "name": "dalen-puppetdbquery",
       "version_requirement": ">= 2.1.1"
     }
   ],
   "data_provider": "hiera"
 }
-
