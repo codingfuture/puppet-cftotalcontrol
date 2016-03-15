@@ -57,10 +57,12 @@ A good procedure is to regularly update SSH private key and its password. For th
     * `cftc_add_key` - manually add key (called on logon)
     * `cftc_deploy_key` - proper procedure to provision newly generated key when old key exists
     * `cftc_check_old_key` - manually check, if private key is too old
+    * `ssh_${hostname} [$cmd]` - logon to specific host
+    * `ssh_${hostname}_{stdcmd} [args]` - invoke standard command (`{stdcmd}`) on specific host
     * `ssh_masscmd {cmd}` - sequentially invoke `{cmd}` on all hosts
-    * `ssh_mass_{stdcmd} {args}` - sequentially invoke standard command (`{stdcmd}`) on all hosts
+    * `ssh_mass_{stdcmd} [args]` - sequentially invoke standard command (`{stdcmd}`) on all hosts
     * `pssh_masscmd {cmd}` - invoke `{cmd}` on all hosts in parallel
-    * `pssh_mass_{stdcmd} {args}` - invoke standard command (`{stdcmd}`) on all hosts in parallel
+    * `pssh_mass_{stdcmd} [args]` - invoke standard command (`{stdcmd}`) on all hosts in parallel
     * `sshgrp_{group}_*` and `psshgrp_{group}_*` - the same as mass commands, but limited to specific group of hosts
 * Standard commands (`{stdcmd}` above):
     * `aptupdate` = `sudo /usr/bin/apt-get update`
@@ -127,7 +129,10 @@ cfnetwork::client_ports:
 
 See details above.
 
-* `pool_proxy = {}`
+* `pool_proxy = {}`. Key => "proxy.hostname" pairs. Key formats:
+    * "${cf_location}/${cf_location_pool}"
+    * "${cf_location}"
+    * "${certname}"
 * `control_user = 'cftcuser'`
 * `control_home = undef` - default under `/home/$control_user`
 * `host_groups = {}` - define custom host host groups to generate `(p)sshgrp_*` commands
@@ -148,3 +153,8 @@ See details above.
 See details above.
 
 * `control_scope = []` - string or array of string with global identifiers of applied control scopes. See above.
+
+## `cftotalcontrol::admin` type
+
+Initialized based on `cftotalcontrol::extra_users` parameter. All parameters are the same as for `cftotalcontrol`, except removed `extra_users`.
+* `control_scope = undef` - control scope of admin user, if any.

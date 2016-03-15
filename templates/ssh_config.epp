@@ -28,7 +28,8 @@ IdentityFile <%= $ssh_idkey %>
     $ssh_port = any2array($cfauth_params['sshd_ports'])[0]
     $proxy_host = pick_default(
         $pool_proxy["${loc}/${locpool}"],
-        $pool_proxy[$loc]
+        $pool_proxy[$loc],
+        $pool_proxy[$nodename],
     )
 -%>
 Host <%= $nodename %>
