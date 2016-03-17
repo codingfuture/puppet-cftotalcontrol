@@ -6,7 +6,7 @@
     Hash $node_cfauth,
     Hash $node_facts,
     Hash $pool_proxy,
-    Optional[String] $control_scope
+    Optional[String] $control_scope = undef,
 | -%>
 StrictHostKeyChecking no
 
