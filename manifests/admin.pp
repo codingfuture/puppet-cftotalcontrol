@@ -48,7 +48,7 @@ define cftotalcontrol::admin (
             [$g, query_nodes($q)]
         }
     }).reduce({}) |$m, $v| {
-        $m + { $v[0] => $v[1] }
+        $m + { $v[0] => sort($v[1]) }
     }
     
     # Build Bash-friendly aliases
