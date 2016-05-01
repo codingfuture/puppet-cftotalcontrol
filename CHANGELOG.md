@@ -5,6 +5,7 @@ project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [0.9.3]
 - A minor fix for custom host group item sorting for determined file content
+- Updated metadata to support Ubuntu Xenian & Debian Stretch
 
 ## [0.9.2]
 - Added a workaround for regression in Puppet 4.4.x related to default value of optional EPP parameter.
