@@ -1,7 +1,7 @@
 
 define cftotalcontrol::admin (
     $control_user = $title,
-    $control_home = "/home/$title",
+    $control_home = "/home/${title}",
     $pool_proxy = $cftotalcontrol::pool_proxy,
     $host_groups = {},
     $parallel = $cftotalcontrol::parallel,
@@ -19,6 +19,8 @@ define cftotalcontrol::admin (
     
     if $control_scope {
         $control_scope_q = " and Cftotalcontrol::Internal::Scope_anchor['${control_scope}']"
+    } else {
+        $control_scope_q = ''
     }
 
     # Only interested in nodes with cftotalcontrol::auth [of specific scope] class
@@ -142,7 +144,7 @@ ${control_user}   ALL=(ALL:ALL) NOPASSWD: /opt/puppetlabs/bin/puppet agent --tes
         group   => $control_user,
         content => '',
         replace => false,
-    } ->    
+    } ->
     file_line {"cftc_include_aliases@${control_user}":
         line => "source ${control_home}/.cftotalcontrol_aliases",
         path => "${control_home}/.bash_aliases",
@@ -152,17 +154,17 @@ ${control_user}   ALL=(ALL:ALL) NOPASSWD: /opt/puppetlabs/bin/puppet agent --tes
         owner   => $control_user,
         group   => $control_user,
         content => epp('cftotalcontrol/bash_aliases.epp', {
-            ssh_config => $ssh_config,
-            ssh_idkey => $ssh_idkey,
-            ssh_dir => $ssh_dir,
-            ssh_key_type => $ssh_key_type,
-            ssh_key_bits => $ssh_key_bits,
-            ssh_old_key_days => $ssh_old_key_days,
+            ssh_config            => $ssh_config,
+            ssh_idkey             => $ssh_idkey,
+            ssh_dir               => $ssh_dir,
+            ssh_key_type          => $ssh_key_type,
+            ssh_key_bits          => $ssh_key_bits,
+            ssh_old_key_days      => $ssh_old_key_days,
             standard_commands_all => $standard_commands_all,
-            node_order => $node_order,
-            node_alias => $node_alias,
-            node_groups => $node_groups,
-            parallel => $parallel,
+            node_order            => $node_order,
+            node_alias            => $node_alias,
+            node_groups           => $node_groups,
+            parallel              => $parallel,
         })
     }
 
@@ -170,29 +172,29 @@ ${control_user}   ALL=(ALL:ALL) NOPASSWD: /opt/puppetlabs/bin/puppet agent --tes
     file { "cftc_ssh_dir@${control_user}":
         ensure => directory,
         path   => $ssh_dir,
-        owner   => $control_user,
-        group   => $control_user,
+        owner  => $control_user,
+        group  => $control_user,
         mode   => '0700',
     } ->
     file { $ssh_config:
         owner   => $control_user,
         group   => $control_user,
-        mode   => '0600',
+        mode    => '0600',
         content => epp('cftotalcontrol/ssh_config.epp', {
-            ssh_dir => $ssh_dir,
-            ssh_config => $ssh_config,
-            ssh_idkey => $ssh_idkey,
-            node_order => $node_order,
-            node_cfauth => $node_cfauth,
-            node_facts => $node_facts,
-            pool_proxy => $pool_proxy,
+            ssh_dir       => $ssh_dir,
+            ssh_config    => $ssh_config,
+            ssh_idkey     => $ssh_idkey,
+            node_order    => $node_order,
+            node_cfauth   => $node_cfauth,
+            node_facts    => $node_facts,
+            pool_proxy    => $pool_proxy,
             control_scope => $control_scope,
         })
     }
     
     # Parallel SSH per group host file
     $node_groups.each |$grp, $nodes| {
-        file { "${ssh_dir}/cftchosts_$grp":
+        file { "${ssh_dir}/cftchosts_${grp}":
             content => join($nodes, "\n")
         }
     }
@@ -252,7 +254,7 @@ ${control_user}   ALL=(ALL:ALL) NOPASSWD: /opt/puppetlabs/bin/puppet agent --tes
     file { "${ssh_idkey}.pub":
         owner   => $control_user,
         group   => $control_user,
-        mode   => '0600',
+        mode    => '0600',
         content => '',
         replace => false,
     }

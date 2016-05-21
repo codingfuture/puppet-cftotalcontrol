@@ -41,11 +41,11 @@ test \"\$SSH_ORIGINAL_COMMAND\" = \"sudo ${deploy_cmd}\" && sudo ${deploy_cmd}
                 replace => true,
                 content => "\n${portuser} ALL=(ALL:ALL) NOPASSWD: ${deploy_cmd}\n",
                 require => Package['sudo'],
-            }        
+            }
         }
         
         $scope_keys = query_facts($key_certname, ['cf_totalcontrol_scope_keys'])
-        
+
         if has_key($scope_keys, $key_certname) and
            $scope_keys[$key_certname]['cf_totalcontrol_scope_keys']
         {
