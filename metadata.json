@@ -37,19 +37,19 @@
     },
     {
       "name": "puppetlabs-apt",
-      "version_requirement": ">= 2.2.2"
+      "version_requirement": ">= 2.3.0"
     },
     {
       "name": "codingfuture-cfnetwork",
-      "version_requirement": ">= 0.9.8"
+      "version_requirement": ">= 0.9.10"
     },
     {
       "name": "codingfuture-cfauth",
-      "version_requirement": ">= 0.9.6"
+      "version_requirement": ">= 0.9.7"
     },
     {
       "name": "dalen-puppetdbquery",
-      "version_requirement": ">= 2.1.1"
+      "version_requirement": ">= 2.2.0"
     }
   ],
   "data_provider": "hiera"
