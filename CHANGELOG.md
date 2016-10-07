@@ -4,7 +4,8 @@ All notable changes to this project will be documented in this file. This
 project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [0.9.5]
-- Updated deps
+- Updated dep versions
+- Fixed private key check expiration
 
 ## [0.9.4]
 - Fixed to pass strict mode checking
