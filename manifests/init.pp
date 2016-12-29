@@ -1,3 +1,7 @@
+#
+# Copyright 2016 (c) Andrey Galkin
+#
+
 
 class cftotalcontrol (
     $control_user = 'cftcuser',
@@ -15,9 +19,9 @@ class cftotalcontrol (
 ) {
     include stdlib
     include cfnetwork
-    
+
     package { 'pssh': }
-    
+
     if $control_user {
         if $control_home {
             $act_control_home = $control_home
@@ -26,7 +30,7 @@ class cftotalcontrol (
         } else {
             $act_control_home = '/home/cftcuser'
         }
-        
+
         cftotalcontrol::admin { $control_user:
             control_home      => $act_control_home,
             pool_proxy        => $pool_proxy,
@@ -40,7 +44,7 @@ class cftotalcontrol (
             ssh_auth_keys     => $ssh_auth_keys,
         }
     }
-    
+
     if $extra_users {
         $extra_users.each |$admin_name, $admin_params| {
             create_resources(
@@ -50,7 +54,7 @@ class cftotalcontrol (
             )
         }
     }
-    
+
     file { '/etc/cfscopekeys/':
         ensure  => directory,
         recurse => true,

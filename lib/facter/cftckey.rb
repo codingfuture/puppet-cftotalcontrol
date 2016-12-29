@@ -1,3 +1,7 @@
+#
+# Copyright 2016 (c) Andrey Galkin
+#
+
 Facter.add('cf_totalcontrol_key') do
     setcode do
         if File.exists? '/etc/cftckey'

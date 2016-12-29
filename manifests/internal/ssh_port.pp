@@ -1,3 +1,7 @@
+#
+# Copyright 2016 (c) Andrey Galkin
+#
+
 
 define cftotalcontrol::internal::ssh_port (
     $hostname,
@@ -6,11 +10,11 @@ define cftotalcontrol::internal::ssh_port (
     $key_certname = undef,
 ) {
     include cfauth
-    
+
     if $control_scope {
         $portuser = "${control_scope}_proxy"
         $deploy_cmd='/opt/puppetlabs/bin/puppet agent --test'
-        
+
         if !defined(Group[$portuser]) {
             group { $portuser:
                 ensure => present,
@@ -43,14 +47,14 @@ test \"\$SSH_ORIGINAL_COMMAND\" = \"sudo ${deploy_cmd}\" && sudo ${deploy_cmd}
                 require => Package['sudo'],
             }
         }
-        
+
         $scope_keys = query_facts($key_certname, ['cf_totalcontrol_scope_keys'])
 
         if has_key($scope_keys, $key_certname) and
            $scope_keys[$key_certname]['cf_totalcontrol_scope_keys']
         {
             $scopekey = $scope_keys[$key_certname]['cf_totalcontrol_scope_keys'][$control_scope]
-            
+
             if $scopekey {
                 ssh_authorized_key { "${control_scope}@${key_certname}":
                     user    => $portuser,
@@ -66,10 +70,10 @@ test \"\$SSH_ORIGINAL_COMMAND\" = \"sudo ${deploy_cmd}\" && sudo ${deploy_cmd}
     } else {
         $portuser = $cfauth::admin_user
     }
-    
+
     $portstr = join($ports,'p')
     $service = "cftc${portuser}${portstr}"
-    
+
     # Virtual as may overlap
     if !defined(Cfnetwork::Describe_service[$service]) {
         cfnetwork::describe_service { $service:

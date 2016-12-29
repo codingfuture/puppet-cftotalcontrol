@@ -1,3 +1,7 @@
+#
+# Copyright 2016 (c) Andrey Galkin
+#
+
 
 define cftotalcontrol::internal::scope_anchor {
     # Just to query PuppetDB which does not support "IN ARRAY" match

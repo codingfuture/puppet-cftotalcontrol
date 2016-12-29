@@ -1,3 +1,7 @@
+#
+# Copyright 2016 (c) Andrey Galkin
+#
+
 
 define cftotalcontrol::admin (
     $control_user = $title,
@@ -16,7 +20,7 @@ define cftotalcontrol::admin (
     $ssh_dir = "${control_home}/.ssh"
     $ssh_config = "${ssh_dir}/cftotalcontrol_config"
     $ssh_idkey = "${ssh_dir}/cftc_id_${ssh_key_type}"
-    
+
     if $control_scope {
         $control_scope_q = " and Cftotalcontrol::Internal::Scope_anchor['${control_scope}']"
     } else {
@@ -33,7 +37,7 @@ define cftotalcontrol::admin (
         merge($m, { $cn => $r['parameters'] })
     })
     $node_order = sort(keys($node_cfauth))
-    
+
     # Known facts
     $node_facts = query_facts("Class['cfauth']", [
         'cf_location',
@@ -41,7 +45,7 @@ define cftotalcontrol::admin (
         'domain',
         'hostname',
     ])
-    
+
     # Build groups
     $node_groups = ($host_groups.map |$g, $q| {
         if is_array($q) {
@@ -52,14 +56,14 @@ define cftotalcontrol::admin (
     }).reduce({}) |$m, $v| {
         $m + { $v[0] => sort($v[1]) }
     }
-    
+
     # Build Bash-friendly aliases
     $node_alias = ($node_cfauth.map |$n, $o|{
         [$n, regsubst($n, '\.', '_', 'G')]
     }).reduce({}) |$m, $v| {
         merge($m, { $v[0] => $v[1] })
     }
-    
+
     # Mass commands
     $standard_commands_all = $standard_commands + {
         'aptupdate'      => 'sudo /usr/bin/apt-get update',
@@ -67,7 +71,7 @@ define cftotalcontrol::admin (
         'aptautoremove'  => 'sudo DEBIAN_FRONTEND=noninteractive /usr/bin/apt-get autoremove',
         'puppetdeploy'   => 'sudo /opt/puppetlabs/puppet/bin/puppet agent --test',
     }
-    
+
     # create user
     if $control_user in ['root', $cfauth::admin_user] {
         # the user must already exist
@@ -191,19 +195,19 @@ ${control_user}   ALL=(ALL:ALL) NOPASSWD: /opt/puppetlabs/bin/puppet agent --tes
             control_scope => $control_scope,
         })
     }
-    
+
     # Parallel SSH per group host file
     $node_groups.each |$grp, $nodes| {
         file { "${ssh_dir}/cftchosts_${grp}":
             content => join($nodes, "\n")
         }
     }
-    
+
     # Parallel SSH all host file
     file { "${ssh_dir}/cftchostsall":
         content => join($node_order, "\n")
     }
-    
+
     # SSH ports
     $ssh_ports = prefix(unique(values($node_cfauth).reduce([]) |$m, $cfauth| {
         $ssh_port = any2array($cfauth['sshd_ports'])[0]
@@ -217,7 +221,7 @@ ${control_user}   ALL=(ALL:ALL) NOPASSWD: /opt/puppetlabs/bin/puppet agent --tes
             user => $control_user,
         }
     }
-    
+
     # Export outgoing proxy ports
     $proxy_ports = $node_cfauth.reduce({}) |$memo, $kv| {
         $nodename = $kv[0]
@@ -249,7 +253,7 @@ ${control_user}   ALL=(ALL:ALL) NOPASSWD: /opt/puppetlabs/bin/puppet agent --tes
             key_certname  => $::trusted['certname'],
         }
     }
-    
+
     # Generate key
     file { "${ssh_idkey}.pub":
         owner   => $control_user,
@@ -258,7 +262,7 @@ ${control_user}   ALL=(ALL:ALL) NOPASSWD: /opt/puppetlabs/bin/puppet agent --tes
         content => '',
         replace => false,
     }
-    
+
     if $control_scope {
         file { "/etc/cfscopekeys/${control_scope}":
             ensure => link,
@@ -270,7 +274,7 @@ ${control_user}   ALL=(ALL:ALL) NOPASSWD: /opt/puppetlabs/bin/puppet agent --tes
             target => "${ssh_idkey}.pub",
         }
     }
-    
+
     if $autogen_ssh_key {
         exec { "cftc_genkey@${control_user}":
             command => "/usr/bin/ssh-keygen -q -t ${ssh_key_type} -b ${ssh_key_bits} -P '' -f ${ssh_idkey}",
@@ -280,7 +284,7 @@ ${control_user}   ALL=(ALL:ALL) NOPASSWD: /opt/puppetlabs/bin/puppet agent --tes
             require => File["cftc_ssh_dir@${control_user}"],
         }
     }
-    
+
     # Cron to check for outdated key
     cron { "cftc_outdated_key@${control_user}":
         command => "bash -c '. ${control_home}/.cftotalcontrol_aliases && cftc_check_old_key'",

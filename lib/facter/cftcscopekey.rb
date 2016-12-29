@@ -1,3 +1,7 @@
+#
+# Copyright 2016 (c) Andrey Galkin
+#
+
 Facter.add('cf_totalcontrol_scope_keys') do
     setcode do
         Dir.glob('/etc/cfscopekeys/*').reduce({}) do |ret, f|
