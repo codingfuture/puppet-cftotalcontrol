@@ -1,5 +1,5 @@
 #
-# Copyright 2016 (c) Andrey Galkin
+# Copyright 2016-2017 (c) Andrey Galkin
 #
 
 Facter.add('cf_totalcontrol_key') do
