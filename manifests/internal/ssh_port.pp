@@ -51,7 +51,7 @@ test \"\$SSH_ORIGINAL_COMMAND\" = \"sudo ${deploy_cmd}\" && sudo ${deploy_cmd}
         $scope_keys = query_facts($key_certname, ['cf_totalcontrol_scope_keys'])
 
         if has_key($scope_keys, $key_certname) and
-           $scope_keys[$key_certname]['cf_totalcontrol_scope_keys']
+            $scope_keys[$key_certname]['cf_totalcontrol_scope_keys']
         {
             $scopekey = $scope_keys[$key_certname]['cf_totalcontrol_scope_keys'][$control_scope]
 

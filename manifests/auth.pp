@@ -21,6 +21,9 @@ class cftotalcontrol::auth (
         'cf_totalcontrol_scope_keys'
     ])
 
+    # TODO: remove
+    $node = 'puppet-lint-warning-workaround'
+
     $tc_keys.each |$node, $f| {
         $factkey = $f['cf_totalcontrol_key']
 
