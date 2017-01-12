@@ -41,11 +41,11 @@
     },
     {
       "name": "codingfuture-cfnetwork",
-      "version_requirement": ">= 0.10.0 <0.11.0"
+      "version_requirement": ">= 0.10.1 <0.11.0"
     },
     {
       "name": "codingfuture-cfauth",
-      "version_requirement": ">= 0.10.0 <0.11.0"
+      "version_requirement": ">= 0.10.1 <0.11.0"
     },
     {
       "name": "dalen-puppetdbquery",
