@@ -92,7 +92,7 @@ A good procedure is to regularly update SSH private key and its password. For th
 ## Technical Support
 
 * [Example configuration](https://github.com/codingfuture/puppet-test)
-* Commercial support: [support@codingfuture.net](mailto:support@codingfuture.net)
+* Free & Commercial support: [support@codingfuture.net](mailto:support@codingfuture.net)
 
 ## Setup
 
