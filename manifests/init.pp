@@ -4,7 +4,7 @@
 
 
 class cftotalcontrol (
-    String[1]
+    Variant[String[1], Boolean]
         $control_user = 'cftcuser',
     Optional[String[1]]
         $control_home = undef,
@@ -34,13 +34,16 @@ class cftotalcontrol (
 
     package { 'pssh': }
 
-    if $control_user {
+    $control_user_act = $control_user ? {
+        true => 'cftcuser',
+        default => $control_user,
+    }
+
+    if $control_user =~ String[1] {
         if $control_home {
             $act_control_home = $control_home
-        } elsif $control_user and $control_user != '' {
-            $act_control_home = "/home/${control_user}"
         } else {
-            $act_control_home = '/home/cftcuser'
+            $act_control_home = "/home/${control_user}"
         }
 
         cftotalcontrol::admin { $control_user:
