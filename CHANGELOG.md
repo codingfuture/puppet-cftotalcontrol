@@ -3,6 +3,9 @@
 All notable changes to this project will be documented in this file. This
 project adheres to [Semantic Versioning](http://semver.org/).
 
+## [0.10.1]
+- Enforced public parameter types
+
 ## [0.10.0]
 - Updated CF deps to v0.10.x
 - Version bump
@@ -28,6 +31,7 @@ project adheres to [Semantic Versioning](http://semver.org/).
 ## [0.9.0]
 Initial release
 
+[0.10.1]: https://github.com/codingfuture/puppet-cftotalcontrol/releases/tag/v0.10.1
 [0.10.0]: https://github.com/codingfuture/puppet-cftotalcontrol/releases/tag/v0.10.0
 [0.9.5]: https://github.com/codingfuture/puppet-cftotalcontrol/releases/tag/v0.9.5
 [0.9.4]: https://github.com/codingfuture/puppet-cftotalcontrol/releases/tag/v0.9.4

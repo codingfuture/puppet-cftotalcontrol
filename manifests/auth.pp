@@ -4,7 +4,8 @@
 
 
 class cftotalcontrol::auth (
-    $control_scope = [],
+    Array[String[1]]
+        $control_scope = [],
 ) {
     include cfauth
 

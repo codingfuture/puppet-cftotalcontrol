@@ -4,18 +4,30 @@
 
 
 class cftotalcontrol (
-    $control_user = 'cftcuser',
-    $control_home = undef,
-    $pool_proxy = {},
-    $host_groups = {},
-    $parallel = 10,
-    $standard_commands = {},
-    $ssh_key_type = 'rsa',
-    $ssh_key_bits = 4096,
-    $autogen_ssh_key = false,
-    $ssh_old_key_days = 180,
-    $ssh_auth_keys = undef,
-    $extra_users = undef,
+    String[1]
+        $control_user = 'cftcuser',
+    Optional[String[1]]
+        $control_home = undef,
+    Hash
+        $pool_proxy = {},
+    Hash
+        $host_groups = {},
+    Integer[1]
+        $parallel = 10,
+    Hash
+        $standard_commands = {},
+    Enum['rsa', 'ed25519']
+        $ssh_key_type = 'rsa',
+    Integer[4096]
+        $ssh_key_bits = 4096, # for rsa
+    Boolean
+        $autogen_ssh_key = false,
+    Integer[1]
+        $ssh_old_key_days = 180,
+    Optional[Hash]
+        $ssh_auth_keys = undef,
+    Optional[Hash]
+        $extra_users = undef,
 ) {
     include stdlib
     include cfnetwork

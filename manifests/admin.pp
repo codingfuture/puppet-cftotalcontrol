@@ -4,18 +4,30 @@
 
 
 define cftotalcontrol::admin (
-    $control_user = $title,
-    $control_home = "/home/${title}",
-    $pool_proxy = $cftotalcontrol::pool_proxy,
-    $host_groups = {},
-    $parallel = $cftotalcontrol::parallel,
-    $standard_commands = $cftotalcontrol::standard_commands,
-    $ssh_key_type = $cftotalcontrol::ssh_key_type,
-    $ssh_key_bits = $cftotalcontrol::ssh_key_bits,
-    $autogen_ssh_key = $cftotalcontrol::autogen_ssh_key,
-    $ssh_old_key_days = $cftotalcontrol::ssh_old_key_days,
-    $control_scope = undef,
-    $ssh_auth_keys = undef,
+    String[1]
+        $control_user = $title,
+    String[1]
+        $control_home = "/home/${title}",
+    Hash
+        $pool_proxy = $cftotalcontrol::pool_proxy,
+    Hash
+        $host_groups = {},
+    Integer[1]
+        $parallel = $cftotalcontrol::parallel,
+    Hash
+        $standard_commands = $cftotalcontrol::standard_commands,
+    Enum['rsa', 'ed25519']
+        $ssh_key_type = $cftotalcontrol::ssh_key_type,
+    Integer[4096]
+        $ssh_key_bits = $cftotalcontrol::ssh_key_bits,
+    Boolean
+        $autogen_ssh_key = $cftotalcontrol::autogen_ssh_key,
+    Integer[1]
+        $ssh_old_key_days = $cftotalcontrol::ssh_old_key_days,
+    Optional[String[1]]
+        $control_scope = undef,
+    Optional[Hash]
+        $ssh_auth_keys = undef,
 ) {
     $ssh_dir = "${control_home}/.ssh"
     $ssh_config = "${ssh_dir}/cftotalcontrol_config"
