@@ -5,6 +5,7 @@ project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [0.10.1]
 - Enforced public parameter types
+- Added 'ntpdate' and 'kernvercheck' mass commands
 
 ## [0.10.0]
 - Updated CF deps to v0.10.x

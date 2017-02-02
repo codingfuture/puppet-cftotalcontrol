@@ -82,6 +82,8 @@ define cftotalcontrol::admin (
         'aptdistupgrade' => 'sudo DEBIAN_FRONTEND=noninteractive /usr/bin/apt-get dist-upgrade -o Dpkg::Options::="--force-confold" -qf',
         'aptautoremove'  => 'sudo DEBIAN_FRONTEND=noninteractive /usr/bin/apt-get autoremove',
         'puppetdeploy'   => 'sudo /opt/puppetlabs/puppet/bin/puppet agent --test',
+        'ntpdate'        => 'sudo /opt/codingfuture/bin/cf_ntpdate',
+        'kernvercheck'   => '/opt/codingfuture/bin/cf_kernel_version_check',
     }
 
     # create user

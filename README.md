@@ -67,7 +67,10 @@ A good procedure is to regularly update SSH private key and its password. For th
 * Standard commands (`{stdcmd}` above):
     * `aptupdate` = `sudo /usr/bin/apt-get update`
     * `aptdistupgrade` = `sudo DEBIAN_FRONTEND=noninteractive /usr/bin/apt-get dist-upgrade -o Dpkg::Options::="--force-confold" -qf`
+    * `aptautoremove` = `sudo DEBIAN_FRONTEND=noninteractive /usr/bin/apt-get autoremove`
     * `puppetdeploy` = `sudo /opt/puppetlabs/puppet/bin/puppet agent --test`
+    * `ntpdate` = `sudo /opt/codingfuture/bin/cf_ntpdate`
+    * `kernvercheck` = `/opt/codingfuture/bin/cf_kernel_version_check`
 * Special environment variables:
     * `CFTC_SSHCONF="$cftotalcontrol::control_home/.ssh/cftotalcontrol_config"` - DO NOT CHANGE
     * `PSSH_COUNT=$cftotalcontrol::parallel` - number of max parallel host processing (can be overridden)
