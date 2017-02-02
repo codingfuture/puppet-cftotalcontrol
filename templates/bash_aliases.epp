@@ -20,7 +20,12 @@ SCP_OPTS=
 
 # Call SSH with TotalControl options
 function cftc_ssh() {
-    ssh -F $CFTC_SSHCONF $SSH_OPTS "$@"
+    local n=$1
+    shift 1
+    echo
+    echo "[*] $n"
+    echo
+    ssh -F $CFTC_SSHCONF $SSH_OPTS "$n" -- "$@"
 }
 
 # Call SCP with TotalControl options
@@ -79,12 +84,12 @@ function cftc_check_old_key() {
 #--------------------------------------
 function ssh_masscmd() {
     for n in $(cat <%= $ssh_dir %>/cftchostsall); do
-        cftc_ssh "$n" -- "$@"
+        cftc_ssh "$n" "$@"
     done
 }
 <% $standard_commands_all.each |$cmdname, $cmd| { -%>
 function ssh_mass_<%= $cmdname %>() {
-    ssh_masscmd <%= $cmd %>
+    ssh_masscmd <%= $cmd %> "$@"
 }
 <% } -%>
 
