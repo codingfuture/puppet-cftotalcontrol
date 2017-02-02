@@ -38,13 +38,9 @@ define cftotalcontrol::internal::ssh_port (
 test \"\$SSH_ORIGINAL_COMMAND\" = \"sudo ${deploy_cmd}\" && sudo ${deploy_cmd}
 ",
             }
-            file {"/etc/sudoers.d/${portuser}":
-                group   => root,
-                owner   => root,
-                mode    => '0400',
-                replace => true,
-                content => "\n${portuser} ALL=(ALL:ALL) NOPASSWD: ${deploy_cmd}\n",
-                require => Package['sudo'],
+            cfauth::sudoentry { $portuser:
+                command => $deploy_cmd,
+                user    => $portuser,
             }
         }
 

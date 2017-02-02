@@ -120,16 +120,11 @@ define cftotalcontrol::admin (
             mode   => '0700',
             source => '/etc/skel/.profile',
         }
-        file {"/etc/sudoers.d/${control_user}":
-            group   => root,
-            owner   => root,
-            mode    => '0400',
-            replace => true,
-            content => "
-${control_user}   ALL=(ALL:ALL) NOPASSWD: /opt/puppetlabs/bin/puppet agent --test
-",
-            require => Package['sudo'],
+        cfauth::sudoentry { $control_user:
+            command => '/opt/puppetlabs/bin/puppet agent --test',
+            user    => $control_user,
         }
+
         if $ssh_auth_keys {
             create_resources(
                 ssh_authorized_key,
