@@ -40,7 +40,6 @@ test \"\$SSH_ORIGINAL_COMMAND\" = \"sudo ${deploy_cmd}\" && sudo ${deploy_cmd}
             }
             cfauth::sudoentry { $portuser:
                 command => $deploy_cmd,
-                user    => $portuser,
             }
         }
 

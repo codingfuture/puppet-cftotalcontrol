@@ -122,7 +122,6 @@ define cftotalcontrol::admin (
         }
         cfauth::sudoentry { $control_user:
             command => '/opt/puppetlabs/bin/puppet agent --test',
-            user    => $control_user,
         }
 
         if $ssh_auth_keys {
