@@ -140,7 +140,7 @@ See details above.
 * `control_home = undef` - default under `/home/$control_user`
 * `host_groups = {}` - define custom host host groups to generate `(p)sshgrp_*` commands
     - array - enumeration of hosts by actual name
-    - string - Puppet DB query for dynamic discovery
+    - string - a PQL statement returning only certname
 * `parallel = 10` - parallel ssh session default
 * `standard_commands = {}` - standard commands to add to the default list
 * `ssh_key_type = 'rsa'` - SSH key type, you may want to use 'ed25519'.

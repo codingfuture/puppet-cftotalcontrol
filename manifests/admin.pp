@@ -34,38 +34,77 @@ define cftotalcontrol::admin (
     $ssh_idkey = "${ssh_dir}/cftc_id_${ssh_key_type}"
 
     if $control_scope {
-        $control_scope_q = " and Cftotalcontrol::Internal::Scope_anchor['${control_scope}']"
+        $control_scope_q = ['and',
+            ['=', 'type', 'Cftotalcontrol::Internal::Scope_anchor'],
+            ['=', 'title', $control_scope],
+        ]
     } else {
-        $control_scope_q = ''
+        $control_scope_q = ['and',
+            ['=', 'type', 'Class'],
+            ['=', 'title', 'Cftotalcontrol::Auth'],
+        ]
     }
 
     # Only interested in nodes with cftotalcontrol::auth [of specific scope] class
-    $node_cfauth = (query_resources(
-        "Class['cftotalcontrol::auth']${control_scope_q}",
-        "Class['cfauth']",
-        false
-    ).reduce({}) |$m, $r|{
+    $node_cfauth = puppetdb_query([
+        'from', 'resources',
+            [ 'extract', ['certname', 'parameters'],
+                ['and',
+                    ['=', 'type', 'Class'],
+                    ['=', 'title', 'Cfauth'],
+                    ['in', 'certname', [ 'extract', 'certname',
+                        [ 'select_resources', $control_scope_q ],
+                    ] ],
+                ]
+            ],
+    ]).reduce({}) |$m, $r|{
         $cn = $r['certname']
-        merge($m, { $cn => $r['parameters'] })
-    })
-    $node_order = sort(keys($node_cfauth))
+        $m + { $cn => $r['parameters'] }
+    }
+
+    $node_order = $node_cfauth.keys().sort()
 
     # Known facts
-    $node_facts = query_facts("Class['cfauth']", [
-        'cf_location',
-        'cf_location_pool',
-        'domain',
-        'hostname',
-    ])
+    $node_facts = puppetdb_query([ 'from', 'facts',
+        ['and',
+            ['in', 'certname', ['extract', 'certname',
+                ['select_resources', ['and',
+                    ['=', 'type', 'Class'],
+                    ['=', 'title', 'Cfauth'],
+                ] ],
+            ] ],
+            ['in', 'name',
+                ['array', [
+                    'cf_location',
+                    'cf_location_pool',
+                ]]
+            ],
+            ['null?', 'value', false],
+        ],
+    ]).reduce({}) |$m, $f| {
+        $h = $f['certname']
+        $n = $f['name']
+        $v = $f['value']
+        merge(
+            $m,
+            {
+                $h => merge(pick($m[$h], {}), {
+                    $n => $v
+                })
+            }
+        )
+    }
 
     # Build groups
-    $node_groups = ($host_groups.map |$g, $q| {
+    $node_groups = $host_groups.map |$g, $q| {
         if is_array($q) {
             [$g, $q]
         } else {
-            [$g, query_nodes($q)]
+            $fq = $q # puppet-lint
+            $qres = puppetdb_query($fq).map |$vv| { $vv['certname'] }
+            [$g, $qres]
         }
-    }).reduce({}) |$m, $v| {
+    }.reduce({}) |$m, $v| {
         $m + { $v[0] => sort($v[1]) }
     }
 

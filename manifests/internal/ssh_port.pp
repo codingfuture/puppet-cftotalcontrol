@@ -4,10 +4,10 @@
 
 
 define cftotalcontrol::internal::ssh_port (
-    $hostname,
-    $ports,
-    $control_scope = undef,
-    $key_certname = undef,
+    String[1] $hostname,
+    Array[Integer[1,65535]] $ports,
+    Optional[String[1]] $control_scope = undef,
+    Optional[String[1]] $key_certname = undef,
 ) {
     include cfauth
 
@@ -43,12 +43,17 @@ test \"\$SSH_ORIGINAL_COMMAND\" = \"sudo ${deploy_cmd}\" && sudo ${deploy_cmd}
             }
         }
 
-        $scope_keys = query_facts($key_certname, ['cf_totalcontrol_scope_keys'])
+        $scope_keys = puppetdb_query([
+            'from', 'facts', ['extract', ['value'],
+                ['and',
+                    ['=', 'certname', $key_certname],
+                    ['=', 'name', 'cf_totalcontrol_scope_keys'],
+                ],
+            ],
+        ])
 
-        if has_key($scope_keys, $key_certname) and
-            $scope_keys[$key_certname]['cf_totalcontrol_scope_keys']
-        {
-            $scopekey = $scope_keys[$key_certname]['cf_totalcontrol_scope_keys'][$control_scope]
+        if size($scope_keys) > 0 {
+            $scopekey = $scope_keys[0]['value'][$control_scope]
 
             if $scopekey {
                 ssh_authorized_key { "${control_scope}@${key_certname}":
