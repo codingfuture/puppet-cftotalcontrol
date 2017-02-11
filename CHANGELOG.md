@@ -8,8 +8,9 @@ project adheres to [Semantic Versioning](http://semver.org/).
 - Enforced public parameter types
 - Added 'ntpdate' and 'kernvercheck' mass commands
 - Converted to cfauth::sudoentry
-- Switched to use puppetdb_query() from PuppetDB termini
+- Switched to use cfsystem::query() from PuppetDB termini
 - Disabled pssh host timeout
+- Changed to depend on cfsystem and uses its internal API
 
 ## [0.10.0]
 - Updated CF deps to v0.10.x

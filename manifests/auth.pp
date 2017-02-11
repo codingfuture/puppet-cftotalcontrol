@@ -17,7 +17,7 @@ class cftotalcontrol::auth (
         cftotalcontrol::internal::scope_anchor{ $cs: }
     }
 
-    $tc_keys = puppetdb_query([ 'from', 'facts',
+    $tc_keys = cfsystem::query([ 'from', 'facts',
         ['extract', ['certname', 'name', 'value'],
             ['and',
                 ['in', 'name',

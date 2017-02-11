@@ -16,9 +16,9 @@ class cftotalcontrol (
         $parallel = 10,
     Hash
         $standard_commands = {},
-    Enum['rsa', 'ed25519']
+    Cfsystem::Keytype
         $ssh_key_type = 'rsa',
-    Integer[4096]
+    Cfsystem::Rsabits
         $ssh_key_bits = 4096, # for rsa
     Boolean
         $autogen_ssh_key = false,

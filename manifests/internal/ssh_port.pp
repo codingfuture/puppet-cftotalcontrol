@@ -5,7 +5,7 @@
 
 define cftotalcontrol::internal::ssh_port (
     String[1] $hostname,
-    Array[Integer[1,65535]] $ports,
+    Array[Cfnetwork::Port] $ports,
     Optional[String[1]] $control_scope = undef,
     Optional[String[1]] $key_certname = undef,
 ) {
@@ -43,7 +43,7 @@ test \"\$SSH_ORIGINAL_COMMAND\" = \"sudo ${deploy_cmd}\" && sudo ${deploy_cmd}
             }
         }
 
-        $scope_keys = puppetdb_query([
+        $scope_keys = cfsystem::query([
             'from', 'facts', ['extract', ['value'],
                 ['and',
                     ['=', 'certname', $key_certname],

@@ -16,9 +16,9 @@ define cftotalcontrol::admin (
         $parallel = $cftotalcontrol::parallel,
     Hash
         $standard_commands = $cftotalcontrol::standard_commands,
-    Enum['rsa', 'ed25519']
+    Cfsystem::Keytype
         $ssh_key_type = $cftotalcontrol::ssh_key_type,
-    Integer[4096]
+    Cfsystem::Rsabits
         $ssh_key_bits = $cftotalcontrol::ssh_key_bits,
     Boolean
         $autogen_ssh_key = $cftotalcontrol::autogen_ssh_key,
@@ -46,7 +46,7 @@ define cftotalcontrol::admin (
     }
 
     # Only interested in nodes with cftotalcontrol::auth [of specific scope] class
-    $node_cfauth = puppetdb_query([
+    $node_cfauth = cfsystem::query([
         'from', 'resources',
             [ 'extract', ['certname', 'parameters'],
                 ['and',
@@ -65,7 +65,7 @@ define cftotalcontrol::admin (
     $node_order = $node_cfauth.keys().sort()
 
     # Known facts
-    $node_facts = puppetdb_query([ 'from', 'facts',
+    $node_facts = cfsystem::query([ 'from', 'facts',
         ['and',
             ['in', 'certname', ['extract', 'certname',
                 ['select_resources', ['and',
@@ -101,7 +101,7 @@ define cftotalcontrol::admin (
             [$g, $q]
         } else {
             $fq = $q # puppet-lint
-            $qres = puppetdb_query($fq).map |$vv| { $vv['certname'] }
+            $qres = cfsystem::query($fq).map |$vv| { $vv['certname'] }
             [$g, $qres]
         }
     }.reduce({}) |$m, $v| {
