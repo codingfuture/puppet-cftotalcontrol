@@ -14,7 +14,7 @@
 
 CFTC_SSHCONF="<%= $ssh_config %>"
 PSSH_COUNT=<%= $parallel %>
-PSSH_OPTS=-i
+PSSH_OPTS=-i --timeout 0
 SSH_OPTS=
 SCP_OPTS=
 
