@@ -40,8 +40,8 @@ define cftotalcontrol::admin (
         ]
     } else {
         $control_scope_q = ['and',
-            ['=', 'type', 'Class'],
             ['=', 'title', 'Cftotalcontrol::Auth'],
+            ['=', 'type', 'Class'],
         ]
     }
 
@@ -50,8 +50,8 @@ define cftotalcontrol::admin (
         'from', 'resources',
             [ 'extract', ['certname', 'parameters'],
                 ['and',
-                    ['=', 'type', 'Class'],
                     ['=', 'title', 'Cfauth'],
+                    ['=', 'type', 'Class'],
                     ['in', 'certname', [ 'extract', 'certname',
                         [ 'select_resources', $control_scope_q ],
                     ] ],
@@ -69,8 +69,8 @@ define cftotalcontrol::admin (
         ['and',
             ['in', 'certname', ['extract', 'certname',
                 ['select_resources', ['and',
-                    ['=', 'type', 'Class'],
                     ['=', 'title', 'Cfauth'],
+                    ['=', 'type', 'Class'],
                 ] ],
             ] ],
             ['in', 'name',
