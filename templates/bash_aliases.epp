@@ -14,7 +14,7 @@
 
 CFTC_SSHCONF="<%= $ssh_config %>"
 PSSH_COUNT=<%= $parallel %>
-PSSH_OPTS=-i --timeout 0
+PSSH_OPTS='-i --timeout 0'
 SSH_OPTS=
 SCP_OPTS=
 
@@ -25,7 +25,7 @@ function cftc_ssh() {
     echo
     echo "[*] $n"
     echo
-    ssh -F $CFTC_SSHCONF $SSH_OPTS "$n" -- "$@"
+    ssh -F $CFTC_SSHCONF $SSH_OPTS "$n" "$@"
 }
 
 # Call SCP with TotalControl options
@@ -84,7 +84,7 @@ function cftc_check_old_key() {
 #--------------------------------------
 function ssh_masscmd() {
     for n in $(cat <%= $ssh_dir %>/cftchostsall); do
-        cftc_ssh "$n" "$@"
+        cftc_ssh "$n" -- "$@"
     done
 }
 <% $standard_commands_all.each |$cmdname, $cmd| { -%>
