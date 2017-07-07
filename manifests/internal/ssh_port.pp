@@ -19,8 +19,8 @@ define cftotalcontrol::internal::ssh_port (
             group { $portuser:
                 ensure => present,
                 tag    => 'cftotalcontrol',
-            } ->
-            user { $portuser:
+            }
+            -> user { $portuser:
                 gid            => $portuser,
                 groups         => ['ssh_access'],
                 home           => "/home/${portuser}",
@@ -29,8 +29,8 @@ define cftotalcontrol::internal::ssh_port (
                 purge_ssh_keys => true,
                 tag            => 'cftotalcontrol',
                 require        => Group[$portuser],
-            } ->
-            file { "/home/${portuser}/forced_command.sh":
+            }
+            -> file { "/home/${portuser}/forced_command.sh":
                 group   => $portuser,
                 owner   => $portuser,
                 mode    => '0755',

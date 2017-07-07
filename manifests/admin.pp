@@ -131,8 +131,8 @@ define cftotalcontrol::admin (
     } else {
         group { $control_user:
             ensure => present,
-        } ->
-        user { $control_user:
+        }
+        -> user { $control_user:
             ensure         => present,
             gid            => $control_user,
             groups         => ['ssh_access'],
@@ -140,20 +140,20 @@ define cftotalcontrol::admin (
             managehome     => true,
             shell          => '/bin/bash',
             purge_ssh_keys => true,
-        } ->
-        file { $control_home:
+        }
+        -> file { $control_home:
             ensure => directory,
             owner  => $control_user,
             group  => $control_user,
             mode   => '0700',
-        } ->
-        file { "${control_home}/.bashrc":
+        }
+        -> file { "${control_home}/.bashrc":
             owner  => $control_user,
             group  => $control_user,
             mode   => '0700',
             source => '/etc/skel/.bashrc',
-        } ->
-        file { "${control_home}/.profile":
+        }
+        -> file { "${control_home}/.profile":
             owner  => $control_user,
             group  => $control_user,
             mode   => '0700',
@@ -195,8 +195,8 @@ define cftotalcontrol::admin (
         group   => $control_user,
         content => '',
         replace => false,
-    } ->
-    file_line {"cftc_include_aliases@${control_user}":
+    }
+    -> file_line {"cftc_include_aliases@${control_user}":
         line => "source ${control_home}/.cftotalcontrol_aliases",
         path => "${control_home}/.bash_aliases",
     }
@@ -226,8 +226,8 @@ define cftotalcontrol::admin (
         owner  => $control_user,
         group  => $control_user,
         mode   => '0700',
-    } ->
-    file { $ssh_config:
+    }
+    -> file { $ssh_config:
         owner   => $control_user,
         group   => $control_user,
         mode    => '0600',
