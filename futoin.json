@@ -2,6 +2,9 @@
   "name": "codingfuture-cftotalcontrol",
   "version": "0.12.0",
   "vcs": "git",
+  "tools" : {
+    "puppet" : "*"
+  },
   "package": [
     "pkg"
   ]
