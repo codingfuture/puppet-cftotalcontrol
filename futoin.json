@@ -2,10 +2,19 @@
   "name": "codingfuture-cftotalcontrol",
   "version": "0.12.1",
   "vcs": "git",
-  "tools": {
-    "puppet": "*"
-  },
   "package": [
     "pkg"
-  ]
+  ],
+  "tools": {
+    "puppet": "*",
+    "release": "*"
+  },
+  "plugins": {
+    "release": "futoin.cid.misc.releasetool"
+  },
+  "toolTune": {
+    "release": {
+      "changelog": "CHANGELOG.md"
+    }
+  }
 }
