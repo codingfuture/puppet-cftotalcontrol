@@ -129,13 +129,19 @@ define cftotalcontrol::admin (
     if $control_user in ['root', $cfauth::admin_user] {
         # the user must already exist
     } else {
+        if $node_cfauth[ $::facts['fqdn'] ] {
+            $extra_group = [ 'wheel' ]
+        } else {
+            $extra_group = []
+        }
+
         group { $control_user:
             ensure => present,
         }
         -> user { $control_user:
             ensure         => present,
             gid            => $control_user,
-            groups         => ['ssh_access'],
+            groups         => ['ssh_access'] + $extra_group,
             home           => $control_home,
             managehome     => true,
             shell          => '/bin/bash',
