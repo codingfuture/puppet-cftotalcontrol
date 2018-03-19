@@ -3,7 +3,7 @@
 All notable changes to this project will be documented in this file. This
 project adheres to [Semantic Versioning](http://semver.org/).
 
-## (next)
+## 0.12.2 (2018-03-19)
 - NEW: add control user to wheel group, if it has access to current host
 
 ## [0.12.1](https://github.com/codingfuture/puppet-cftotalcontrol/releases/tag/v0.12.1)
