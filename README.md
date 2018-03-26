@@ -99,6 +99,8 @@ A good procedure is to regularly update SSH private key and its password. For th
 
 ## Setup
 
+Up to date installation instructions are available in Puppet Forge: https://forge.puppet.com/codingfuture/cftotalcontrol
+
 * Add `cftotalcontrol` class to host with Total Control user
 * Add `cftotalcontrol::auth` class to all other hosts (preferably, use common Hiera config)
 
