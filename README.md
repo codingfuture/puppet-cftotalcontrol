@@ -3,9 +3,9 @@
 ## Description
 
 The module creates a special CodingFuture Total Control (CFTC) user in a system whose special public key
-is added to [cfauth](https://forge.puppetlabs.com/codingfuture/cfauth) admin user access on all infrastructure hosts.
+is added to [cfauth](https://codingfuture.net/docs/cfauth) admin user access on all infrastructure hosts.
 
-This module requires PuppetDB support, see [cfpuppetserver module](https://forge.puppetlabs.com/codingfuture/cfpuppetserver).
+This module requires PuppetDB support, see [cfpuppetserver module](https://codingfuture.net/docs/cfpuppetserver).
 All configuration is dynamically created based on facts and resources from PuppetDB.
 
 It is possible to configure SSH proxy hosts to access internal remote hosts. It is also possible to have control users limited to a set of hosts (scope).*Note: instead of relatively insecure SSH Agent forwarding, a much more secure SSH Port forwarding is used to avoid possible exposure of SSH private keys on remote and intermediate hosts.*
@@ -103,7 +103,7 @@ A good procedure is to regularly update SSH private key and its password. For th
 * Add `cftotalcontrol::auth` class to all other hosts (preferably, use common Hiera config)
 
 Please use [librarian-puppet](https://rubygems.org/gems/librarian-puppet/) or
-[cfpuppetserver module](https://forge.puppetlabs.com/codingfuture/cfpuppetserver) to deal with dependencies.
+[cfpuppetserver module](https://codingfuture.net/docs/cfpuppetserver) to deal with dependencies.
 
 There is a known r10k issue [RK-3](https://tickets.puppetlabs.com/browse/RK-3) which prevents
 automatic dependencies of dependencies installation.
