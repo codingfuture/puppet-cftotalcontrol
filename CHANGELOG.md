@@ -3,7 +3,7 @@
 All notable changes to this project will be documented in this file. This
 project adheres to [Semantic Versioning](http://semver.org/).
 
-## (next)
+## 1.0.1 (2018-04-13)
 - FIXED: to explicitly control ssh-agent avoiding zombie processes
 
 ## 0.12.2 (2018-03-19)
