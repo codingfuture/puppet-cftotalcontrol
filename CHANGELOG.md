@@ -3,6 +3,9 @@
 All notable changes to this project will be documented in this file. This
 project adheres to [Semantic Versioning](http://semver.org/).
 
+## (next)
+- FIXED: to explicitly control ssh-agent avoiding zombie processes
+
 ## 0.12.2 (2018-03-19)
 - NEW: add control user to wheel group, if it has access to current host
 

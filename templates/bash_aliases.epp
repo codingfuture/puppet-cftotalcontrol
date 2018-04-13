@@ -65,8 +65,11 @@ function cftc_gen_key() {
 
 # Initialize agent and add ssh key
 function cftc_add_key() {
-    test -n "$SSH_AUTH_SOCK" && test -e "$SSH_AUTH_SOCK" || \
-        eval `ssh-agent` && ssh-add <%= $ssh_idkey %>
+    if [ -z "$SSH_AUTH_SOCK" ]; then
+        exec ssh-agent bash
+    fi
+
+    ssh-add <%= $ssh_idkey %>
 }
 
 
