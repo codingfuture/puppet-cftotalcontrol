@@ -35,7 +35,7 @@ IdentityFile <%= $ssh_idkey %>
 Host <%= $nodename %>
     User <%= $cfauth_params['admin_user'] %>
     Port <%= $ssh_port %>
-<% if is_string($proxy_host) and $proxy_host != '' { 
+<% if is_string($proxy_host) and $proxy_host != '' and $proxy_host != $nodename { 
     if $control_scope { -%>
     ProxyCommand /usr/bin/ssh -W <%= $nodename %>:<%= $ssh_port %> -F <%= $ssh_config %> <%= $control_scope %>_proxy@<%= $proxy_host %>
 <%  } else { -%>
