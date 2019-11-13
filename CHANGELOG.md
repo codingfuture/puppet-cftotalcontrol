@@ -3,7 +3,7 @@
 All notable changes to this project will be documented in this file. This
 project adheres to [Semantic Versioning](http://semver.org/).
 
-## (next)
+## 1.3.1 (2019-11-13)
 - FIXED: not to proxy to proxy host itself
 
 ## 1.1.0 (2018-12-09)
